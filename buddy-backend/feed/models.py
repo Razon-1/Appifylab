@@ -1,3 +1,12 @@
+"""
+FEED APP MODELS
+===============
+Handles posts, comments, and interactions on the social network
+
+MODELS:
+1. Post - User-created posts with content, images, and privacy settings
+2. Comment - Comments and replies on posts with nested reply support
+"""
 from django.db import models
 from django.contrib.auth import get_user_model
 
@@ -6,7 +15,22 @@ User = get_user_model()
 
 class Post(models.Model):
     """
-    Post model with support for private/public visibility and media
+    Post Model - Core content unit for the social network
+    
+    Features:
+    - Public/Private visibility control
+    - Image attachments (up to 5MB)
+    - Like/Unlike functionality
+    - Comment support with nested replies
+    
+    Fields:
+    - author: User who created the post
+    - content: Text content of the post
+    - image: Optional image attachment
+    - privacy: Public or Private visibility
+    - created_at: Post creation timestamp
+    - updated_at: Last modification timestamp
+    - likes: Many-to-many relationship with users who liked it
     """
     PRIVACY_CHOICES = [
         ('public', 'Public - Visible to everyone'),
@@ -22,7 +46,7 @@ class Post(models.Model):
     likes = models.ManyToManyField(User, related_name='liked_posts', blank=True)
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ['-created_at']  # Newest posts first
 
     def __str__(self):
         return f"Post by {self.author.username} ({self.privacy})"
@@ -38,7 +62,21 @@ class Post(models.Model):
 
 class Comment(models.Model):
     """
-    Comment model with support for nested replies and likes
+    Comment Model - Comments and replies on posts
+    
+    Features:
+    - Nested replies (a comment can reply to another comment)
+    - Like/Unlike functionality
+    - Associated with a specific post
+    
+    Fields:
+    - post: The post this comment is attached to
+    - author: User who posted the comment
+    - content: Comment text
+    - parent: Optional parent comment (for reply support)
+    - likes: Many-to-many relationship with users who liked it
+    - created_at: Comment creation timestamp
+    - updated_at: Last modification timestamp
     """
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
     author = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -49,7 +87,7 @@ class Comment(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['created_at']
+        ordering = ['created_at']  # Oldest comments first
 
     def __str__(self):
         comment_type = 'Reply' if self.parent else 'Comment'

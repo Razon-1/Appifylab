@@ -1,5 +1,16 @@
 """
-Django settings for buddy_script project.
+BUDDY SCRIPT - BACKEND SETTINGS
+================================
+Project: Full-stack social networking platform
+Framework: Django REST Framework with MySQL database
+Purpose: Core configuration for Buddy Script backend application
+
+KEY FEATURES CONFIGURED:
+- Authentication: Token-based auth with JWT support
+- CORS: Cross-origin requests for frontend communication
+- Database: MySQL for persistent data storage
+- Media: Image uploads for profiles and posts
+- Logging: Request/response logging and error handling
 """
 
 from pathlib import Path

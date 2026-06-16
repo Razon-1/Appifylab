@@ -1,5 +1,34 @@
 """
-User authentication and profile management views
+USERS APP VIEWS
+===============
+Handles user authentication, registration, and profile management
+
+KEY FEATURES:
+1. AuthViewSet - User authentication operations
+   - register: Create new user account with email/username/password
+   - login: Authenticate user and return profile + token
+   - logout: End user session
+
+2. UserViewSet - Profile management (if implemented)
+   - get_profile: Fetch authenticated user's profile
+   - update_profile: Update user profile info (bio, picture)
+   - search_users: Find users by username or name
+   - get_public_profile: View another user's public profile
+
+SECURITY:
+- Password hashing and validation
+- Token-based authentication for API requests
+- Email validation
+- CSRF protection enabled
+- Only authenticated users can access protected endpoints
+
+API RESPONSE FORMAT:
+All responses follow standard format:
+{
+  "success": true/false,
+  "message": "descriptive message",
+  "data": { ...response data... }
+}
 """
 import logging
 from rest_framework import viewsets, status

@@ -1,6 +1,43 @@
 /**
- * Post Card Component
- * Displays individual posts with likes, comments, replies, and visibility.
+ * POST CARD COMPONENT
+ * ===================
+ * Displays individual posts with interactions (likes, comments)
+ * 
+ * FEATURES:
+ * 1. Post Display
+ *    - Author information
+ *    - Post content and image
+ *    - Creation date/time
+ *    - Privacy indicator (Public/Private)
+ * 
+ * 2. Interactions
+ *    - Like/Unlike toggle
+ *    - Like count display
+ *    - View likes list (user modal)
+ *    - Comments section (collapsible)
+ * 
+ * 3. Post Management
+ *    - Delete button (author only)
+ *    - Edit functionality (if implemented)
+ *    - Error handling
+ * 
+ * 4. Comments
+ *    - Show/hide comments toggle
+ *    - Nested comment support (replies)
+ *    - Comment likes
+ * 
+ * PROPS:
+ * - post: Post object from API
+ * - darkMode: Boolean for dark theme
+ * - onPostDeleted: Callback when post deleted
+ * - onRefresh: Callback to refresh data
+ * 
+ * STATE:
+ * - showComments: Toggle comment visibility
+ * - isLiked: Current like status
+ * - likesCount: Number of likes
+ * - showLikers: Toggle likes list modal
+ * - likedByUsers: List of users who liked
  */
 
 import React, { useState } from 'react';
@@ -8,6 +45,7 @@ import { feedAPI } from '../api/api';
 import Comments from './Comments';
 
 export default function PostCard({ post, darkMode, onPostDeleted, onRefresh }) {
+  // UI state
   const [showComments, setShowComments] = useState(false);
   const [isLiked, setIsLiked] = useState(Boolean(post.is_liked));
   const [likesCount, setLikesCount] = useState(post.likes_count || 0);
@@ -16,6 +54,12 @@ export default function PostCard({ post, darkMode, onPostDeleted, onRefresh }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  /**
+   * Handle like/unlike toggle
+   * - API request to toggle like
+   * - Update like count and status
+   * - Fetch liked users list if modal open
+   */
   const handleLike = async () => {
     try {
       setLoading(true);
@@ -24,6 +68,7 @@ export default function PostCard({ post, darkMode, onPostDeleted, onRefresh }) {
       setIsLiked(Boolean(response.data?.data?.is_liked));
       setLikesCount(response.data?.data?.likes_count || 0);
 
+      // Refresh likes list if modal open
       if (showLikers) {
         const likesResponse = await feedAPI.getPostLikes(post.id);
         setLikedByUsers(likesResponse.data?.data || []);
@@ -35,6 +80,12 @@ export default function PostCard({ post, darkMode, onPostDeleted, onRefresh }) {
     }
   };
 
+  /**
+   * Handle post deletion
+   * - Request confirmation
+   * - API delete request
+   * - Notify parent component
+   */
   const handleDelete = async () => {
     if (!window.confirm('Are you sure you want to delete this post?')) return;
 
@@ -46,6 +97,11 @@ export default function PostCard({ post, darkMode, onPostDeleted, onRefresh }) {
     }
   };
 
+  /**
+   * Toggle and fetch likes list
+   * - Fetch users who liked on first open
+   * - Toggle modal visibility
+   */
   const handleShowLikers = async () => {
     if (!showLikers) {
       try {
@@ -58,17 +114,21 @@ export default function PostCard({ post, darkMode, onPostDeleted, onRefresh }) {
     setShowLikers((current) => !current);
   };
 
+  // Format post creation date
   const createdAt = new Date(post.created_at);
 
   return (
     <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow p-6 mb-4`}>
+      {/* Error Display */}
       {error && (
         <div className="mb-4 bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded text-sm">
           {error}
         </div>
       )}
 
+      {/* Post Header */}
       <div className="flex items-start gap-4">
+        {/* Author Avatar */}
         <div className="flex-shrink-0">
           <div
             className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-white ${
@@ -79,9 +139,11 @@ export default function PostCard({ post, darkMode, onPostDeleted, onRefresh }) {
           </div>
         </div>
 
+        {/* Post Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-4">
             <div>
+              {/* Author Info */}
               <p className="font-semibold">{post.author?.username || 'Unknown'}</p>
               <div className="flex items-center gap-2 text-sm text-gray-500">
                 <span>
@@ -92,6 +154,7 @@ export default function PostCard({ post, darkMode, onPostDeleted, onRefresh }) {
               </div>
             </div>
 
+            {/* Delete Button (Author Only) */}
             {post.can_delete && (
               <button
                 onClick={handleDelete}

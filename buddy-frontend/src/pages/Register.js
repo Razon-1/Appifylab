@@ -1,24 +1,70 @@
+/**
+ * REGISTRATION PAGE
+ * =================
+ * New user account creation page
+ * 
+ * FEATURES:
+ * - Email/username registration
+ * - First and last name fields
+ * - Password confirmation
+ * - Show/hide password toggles
+ * - Terms & conditions agreement
+ * - Form validation
+ * - Error handling
+ * - Responsive design
+ * 
+ * VALIDATION:
+ * - All fields required
+ * - Passwords must match
+ * - Must agree to terms
+ * - Email format validation (backend)
+ * - Unique email/username check (backend)
+ * 
+ * FLOW:
+ * 1. User fills registration form
+ * 2. Form validates on submit
+ * 3. API request to register endpoint
+ * 4. On success: Auto-login, redirect to /feed
+ * 5. On error: Display error message
+ * 
+ * NAVIGATION:
+ * - Existing users can navigate to /login
+ * - After registration, redirects to /feed
+ */
+
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authAPI } from '../api/api';
 
 export default function Register({ onRegister }) {
+  // Form state
   const [email, setEmail] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  
+  // UI state
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  
   const navigate = useNavigate();
 
+  /**
+   * Handle form submission
+   * - Validate all fields
+   * - Check password match
+   * - Make API request
+   * - Auto-login on success
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
+    // Validation
     if (!firstName.trim()) {
       setError('First name is required');
       return;
@@ -52,12 +98,22 @@ export default function Register({ onRegister }) {
     setLoading(true);
 
     try {
+      // Call registration API endpoint
       const response = await authAPI.register(email, firstName, lastName, password, confirmPassword);
       const data = response.data.data || response.data;
+      
+      // Auto-login and redirect
       onRegister(data);
       navigate('/feed');
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <section className="min-h-screen flex flex-col lg:flex-row bg-white">
     } finally {
       setLoading(false);
     }

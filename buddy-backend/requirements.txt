@@ -1,3 +1,31 @@
+# BUDDY SCRIPT BACKEND DEPENDENCIES
+# ==================================
+# 
+# FRAMEWORK & API:
+# - Django (4.2.3)                    - Web framework, ORM, admin panel
+# - djangorestframework (3.14.0)      - REST API framework with viewsets/serializers
+# - djangorestframework-simplejwt     - JWT token authentication
+#
+# DATABASE:
+# - PyMySQL (1.1.0)                   - MySQL database driver (MySQL-compatible)
+#
+# CONFIGURATION:
+# - python-decouple (3.8)             - Load environment variables from .env file
+#
+# SECURITY:
+# - PyJWT (2.8.0)                     - JSON Web Token handling
+# - django-cors-headers (4.2.0)       - CORS support for frontend requests
+#
+# INSTALLATION:
+# Run: pip install -r requirements.txt
+#
+# ENVIRONMENT SETUP:
+# Create .env file with:
+#   SECRET_KEY=your-secret-key
+#   DEBUG=True (development only)
+#   DATABASE_URL=mysql://user:pass@localhost:3306/buddy_db
+#   ALLOWED_HOSTS=localhost,127.0.0.1
+
 Django==4.2.3
 djangorestframework==3.14.0
 django-cors-headers==4.2.0

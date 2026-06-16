@@ -1,5 +1,24 @@
 #!/usr/bin/env python
-"""Django's command-line utility for administrative tasks."""
+"""
+DJANGO MANAGEMENT UTILITY
+=========================
+Central command-line utility for Django administrative tasks
+
+COMMON COMMANDS:
+- python manage.py runserver              - Start development server
+- python manage.py migrate                - Apply database migrations
+- python manage.py migrate <app>          - Migrate specific app
+- python manage.py makemigrations         - Create database migrations
+- python manage.py createsuperuser        - Create admin user
+- python manage.py shell                  - Interactive Python shell
+- python manage.py test                   - Run tests
+- python manage.py collectstatic          - Collect static files
+
+ENVIRONMENT:
+- Uses Django settings from buddy_script.settings
+- Requires virtual environment to be activated
+- Database configuration in settings.py
+"""
 import os
 import sys
 

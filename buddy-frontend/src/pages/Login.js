@@ -1,28 +1,66 @@
+/**
+ * LOGIN PAGE
+ * ==========
+ * User authentication page for existing users
+ * 
+ * FEATURES:
+ * - Email/password authentication
+ * - Remember me functionality
+ * - Form validation
+ * - Error handling with user feedback
+ * - Responsive design (mobile + desktop)
+ * - Decorative UI elements
+ * 
+ * FLOW:
+ * 1. User enters email and password
+ * 2. Form validates input
+ * 3. API request to backend
+ * 4. On success: Store token, redirect to /feed
+ * 5. On error: Display error message
+ * 
+ * NAVIGATION:
+ * - New users can navigate to /register
+ * - After login, redirects to /feed
+ */
+
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authAPI } from '../api/api';
 
 export default function Login({ onLogin }) {
+  // Form state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+  
+  // UI state
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  
   const navigate = useNavigate();
 
+  /**
+   * Handle form submission
+   * - Validate inputs
+   * - Make API request
+   * - Handle success/error responses
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
+      // Call login API endpoint
       const response = await authAPI.login(email, password);
       const data = response.data.data || response.data;
       
+      // Save remember-me preference
       if (rememberMe) {
         localStorage.setItem('rememberMe', 'true');
       }
       
+      // Update global auth state and navigate to feed
       onLogin(data);
       navigate('/feed');
     } catch (err) {

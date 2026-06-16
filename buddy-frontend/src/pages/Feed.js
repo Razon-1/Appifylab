@@ -1,3 +1,45 @@
+/**
+ * FEED PAGE
+ * =========
+ * Main social feed page displaying posts and interactions
+ * 
+ * FEATURES:
+ * 1. Post Feed
+ *    - List all public posts and user's private posts
+ *    - Post creation capability
+ *    - Post deletion (author only)
+ *    - Real-time feed updates
+ * 
+ * 2. Post Interactions
+ *    - Like/unlike posts
+ *    - View likes list
+ *    - Comment on posts
+ *    - Reply to comments
+ *    - Like comments
+ * 
+ * 3. User Interface
+ *    - Dark mode toggle
+ *    - Mobile responsive design
+ *    - Navigation header
+ *    - Sidebar for navigation (desktop)
+ *    - Mobile menu support
+ * 
+ * 4. State Management
+ *    - Posts list
+ *    - Loading state
+ *    - Error handling
+ *    - Dark mode preference (localStorage)
+ * 
+ * FLOW:
+ * 1. Component loads and fetches posts
+ * 2. Posts displayed in feed (newest first)
+ * 3. User can create post → updates feed immediately
+ * 4. User can like post → updates count immediately
+ * 5. User can delete post → removes from feed
+ * 6. User can view comments → Comments component handles details
+ * 7. User can logout → redirects to /login
+ */
+
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
@@ -8,22 +50,34 @@ import CreatePost from '../components/CreatePost';
 export default function Feed() {
   const navigate = useNavigate();
   const { logout } = useContext(AuthContext);
+  
+  // Feed state
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  /**
+   * Load feed posts on component mount
+   * - Check for saved dark mode preference
+   * - Fetch posts from backend
+   */
   useEffect(() => {
     fetchPosts();
     const isDark = localStorage.getItem('darkMode') === 'true';
     setDarkMode(isDark);
   }, []);
 
+  /**
+   * Fetch posts from backend
+   * - Error handling with user feedback
+   */
   const fetchPosts = async () => {
     try {
       setError(null);
       const response = await feedAPI.getPosts();
+      // Handle different response structures
       setPosts(response.data?.data || response.data?.results || []);
     } catch (err) {
       setError(err.response?.data?.message || err.message || 'Failed to load feed');
@@ -32,19 +86,37 @@ export default function Feed() {
     }
   };
 
+  /**
+   * Handle new post creation
+   * - Add post to top of feed immediately
+   */
   const handlePostCreated = (post) => {
     setPosts((currentPosts) => [post, ...currentPosts]);
   };
 
+  /**
+   * Handle post deletion
+   * - Remove post from feed
+   */
   const handlePostDeleted = (postId) => {
     setPosts((currentPosts) => currentPosts.filter((post) => post.id !== postId));
   };
 
+  /**
+   * Handle user logout
+   * - Clear auth state
+   * - Redirect to login
+   */
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
+  /**
+   * Toggle dark mode
+   * - Update state
+   * - Save preference to localStorage
+   */
   const toggleDarkMode = () => {
     const newDarkMode = !darkMode;
     setDarkMode(newDarkMode);
@@ -53,7 +125,7 @@ export default function Feed() {
 
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'} transition-colors duration-300`}>
-      {/* Mobile Header */}
+      {/* Mobile Header - Only visible on small screens */}
       <div className="md:hidden sticky top-0 z-50 bg-white dark:bg-gray-800 shadow">
         <div className="flex items-center justify-between px-4 py-3">
           <img src="/assets/images/logo.svg" alt="Logo" className="h-8 w-auto" />
@@ -76,7 +148,7 @@ export default function Feed() {
         )}
       </div>
 
-      {/* Desktop Header/Navbar */}
+      {/* Desktop Header/Navbar - Only visible on medium screens and up */}
       <nav className="hidden md:flex sticky top-0 z-50 bg-white dark:bg-gray-800 shadow items-center justify-between px-4 md:px-6 lg:px-8 py-4">
         {/* Logo */}
         <div className="flex-shrink-0">

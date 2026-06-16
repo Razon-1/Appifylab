@@ -1,5 +1,35 @@
 """
-Feed views for posts and comments management
+FEED APP VIEWS
+==============
+Handles all post and comment operations for the social feed
+
+KEY FEATURES:
+1. PostViewSet - Complete CRUD operations for posts
+   - List: Fetch public posts + user's private posts (for their own view)
+   - Create: Create new posts with optional images
+   - Update: Edit posts (author only)
+   - Delete: Remove posts (author only)
+   - Like: Toggle like/unlike status
+   - Liked_by: View users who liked a post
+
+2. CommentViewSet - Complete CRUD operations for comments and replies
+   - List: Get all comments for a specific post
+   - Create: Post new comment or reply to existing comment
+   - Delete: Remove comments (author only)
+   - Like: Toggle like/unlike status on comments
+   - Liked_by: View users who liked a comment
+
+PRIVACY & PERMISSIONS:
+- All endpoints require authentication
+- Users can only edit/delete their own posts and comments
+- Public posts visible to all users
+- Private posts visible only to author
+- Comments can be nested (replies to comments)
+
+PERFORMANCE OPTIMIZATIONS:
+- Query optimization with select_related() and prefetch_related()
+- Pagination support for large feed lists
+- Efficient like count retrieval
 """
 import logging
 from rest_framework import viewsets, status

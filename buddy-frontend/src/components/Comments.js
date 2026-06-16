@@ -1,25 +1,74 @@
 /**
- * Comments Component
- * Displays comments and replies for a post.
+ * COMMENTS COMPONENT
+ * ==================
+ * Displays comments and replies for a post
+ * 
+ * FEATURES:
+ * 1. Comments Display
+ *    - Top-level comments
+ *    - Nested replies (replies to comments)
+ *    - Author information
+ *    - Timestamps
+ * 
+ * 2. Comment Interactions
+ *    - Like/Unlike comments
+ *    - View likes list for comments
+ *    - Delete own comments
+ *    - Create replies
+ * 
+ * 3. Comment Creation
+ *    - Add new top-level comments
+ *    - Reply to existing comments
+ *    - Nested reply support
+ * 
+ * 4. State Management
+ *    - Comments list with replies
+ *    - Like status per comment
+ *    - Reply form visibility
+ *    - Expanded likes modals
+ * 
+ * PROPS:
+ * - postId: ID of post these comments belong to
+ * - darkMode: Boolean for dark theme
+ * - onCommentAdded: Callback when comment added
+ * 
+ * FLOW:
+ * 1. Load comments for post on mount
+ * 2. Display comments with nested replies
+ * 3. User can add comment or reply
+ * 4. User can like comments
+ * 5. User can delete their own comments
+ * 6. Comments list updates immediately on changes
  */
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { feedAPI } from '../api/api';
 
+/**
+ * Format list of users for display
+ */
 const getUsersText = (users = []) => {
   if (!users.length) return 'No likes yet';
   return users.map((user) => user.username || user.email || 'Unknown').join(', ');
 };
 
 export default function Comments({ postId, darkMode, onCommentAdded }) {
+  // Comments state
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
   const [replyText, setReplyText] = useState('');
   const [replyingTo, setReplyingTo] = useState(null);
   const [expandedLikes, setExpandedLikes] = useState({});
+  
+  // UI state
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  /**
+   * Fetch comments for the post
+   * - Gets top-level comments
+   * - Includes nested replies
+   */
   const fetchComments = useCallback(async () => {
     try {
       const response = await feedAPI.getComments(postId);
@@ -29,10 +78,17 @@ export default function Comments({ postId, darkMode, onCommentAdded }) {
     }
   }, [postId]);
 
+  // Load comments on component mount or postId change
   useEffect(() => {
     fetchComments();
   }, [fetchComments]);
 
+  /**
+   * Add new top-level comment
+   * - Validate not empty
+   * - Submit to API
+   * - Refresh comments list
+   */
   const handleAddComment = async (e) => {
     e.preventDefault();
     if (!newComment.trim()) return;
@@ -51,6 +107,12 @@ export default function Comments({ postId, darkMode, onCommentAdded }) {
     }
   };
 
+  /**
+   * Add reply to comment
+   * - Validate not empty
+   * - Submit to API with parent comment ID
+   * - Refresh comments
+   */
   const handleAddReply = async (e, parentCommentId) => {
     e.preventDefault();
     if (!replyText.trim()) return;
@@ -70,6 +132,9 @@ export default function Comments({ postId, darkMode, onCommentAdded }) {
     }
   };
 
+  /**
+   * Like/Unlike a comment
+   */
   const handleLikeComment = async (commentId) => {
     try {
       await feedAPI.likeComment(commentId);
@@ -79,6 +144,11 @@ export default function Comments({ postId, darkMode, onCommentAdded }) {
     }
   };
 
+  /**
+   * Toggle likes list modal for comment
+   * - Fetch likes on first open
+   * - Toggle visibility
+   */
   const toggleLikedBy = async (commentId) => {
     if (expandedLikes[commentId]) {
       setExpandedLikes((current) => ({ ...current, [commentId]: null }));
@@ -96,6 +166,9 @@ export default function Comments({ postId, darkMode, onCommentAdded }) {
     }
   };
 
+  /**
+   * Render like summary with clickable link
+   */
   const renderLikeSummary = (item) => (
     <>
       {item.likes_count > 0 && (

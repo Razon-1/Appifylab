@@ -1,7 +1,34 @@
 /**
- * Error Boundary Component
- * Catches errors in child components and displays error UI
+ * ERROR BOUNDARY COMPONENT
+ * =======================
+ * Error boundary class component that catches React errors in child components
+ * 
+ * PURPOSE:
+ * - Prevents entire app from crashing on component errors
+ * - Displays user-friendly error messages
+ * - Logs errors for debugging
+ * - Provides error recovery options
+ * 
+ * BEHAVIOR:
+ * - Catches errors in render, lifecycle methods, and constructors
+ * - Does NOT catch:
+ *   - Event handler errors (use try/catch)
+ *   - Async code errors (use promises/try-catch)
+ *   - Server-side rendering errors
+ *   - Errors in itself
+ * 
+ * USAGE:
+ * Wrap components that might error:
+ * <ErrorBoundary>
+ *   <SomeComponent />
+ * </ErrorBoundary>
+ * 
+ * STATE:
+ * - hasError: Boolean indicating error occurred
+ * - error: Error object
+ * - errorInfo: Component stack trace
  */
+
 import React from 'react';
 
 class ErrorBoundary extends React.Component {
@@ -14,18 +41,30 @@ class ErrorBoundary extends React.Component {
     };
   }
 
+  /**
+   * Update state when error is caught
+   * Called during render phase
+   */
   static getDerivedStateFromError(error) {
     return { hasError: true };
   }
 
+  /**
+   * Log error details
+   * Called after render fails
+   */
   componentDidCatch(error, errorInfo) {
     this.setState({
       error,
       errorInfo,
     });
+    // Log to console for development debugging
     console.error('Error caught by boundary:', error, errorInfo);
   }
 
+  /**
+   * Reset error state to retry
+   */
   handleReset = () => {
     this.setState({
       hasError: false,
@@ -39,6 +78,7 @@ class ErrorBoundary extends React.Component {
       return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
           <div className="max-w-md w-full bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
+            {/* Error Icon */}
             <div className="flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mx-auto">
               <svg
                 className="h-6 w-6 text-red-600"
@@ -55,6 +95,7 @@ class ErrorBoundary extends React.Component {
                 />
               </svg>
             </div>
+            {/* Error Title */}
             <h1 className="mt-4 text-lg font-medium text-gray-900 dark:text-white text-center">
               Something went wrong
             </h1>
