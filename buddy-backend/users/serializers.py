@@ -6,7 +6,7 @@ User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'bio', 'profile_picture', 'created_at')
+        fields = ('id', 'username', 'email', 'first_name', 'last_name')
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
@@ -14,7 +14,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'username', 'password', 'password_confirm')
+        fields = ('email', 'first_name', 'last_name', 'password', 'password_confirm')
 
     def validate(self, data):
         if data['password'] != data['password_confirm']:
@@ -25,6 +25,11 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data.pop('password_confirm')
+        # Generate username from first_name and last_name
+        first_name = validated_data.get('first_name', '').lower()
+        last_name = validated_data.get('last_name', '').lower()
+        username = f"{first_name}{last_name}" if first_name and last_name else validated_data['email'].split('@')[0]
+        validated_data['username'] = username
         user = User.objects.create_user(**validated_data)
         return user
 
@@ -33,10 +38,16 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
 
     def validate(self, data):
-        from django.contrib.auth import authenticate
-        user = authenticate(username=data['email'], password=data['password'])
-        if not user:
+        # First find user by email
+        try:
+            user = User.objects.get(email=data['email'])
+        except User.DoesNotExist:
             raise serializers.ValidationError("Invalid credentials")
+        
+        # Then check password
+        if not user.check_password(data['password']):
+            raise serializers.ValidationError("Invalid credentials")
+        
         data['user'] = user
         return data
 

@@ -23,7 +23,7 @@ export default api;
 // Auth endpoints
 export const authAPI = {
   login: (email, password) => api.post('/auth/login/', { email, password }),
-  register: (email, password, password_confirm) => api.post('/auth/register/', { email, password, password_confirm }),
+  register: (email, firstName, lastName, password, password_confirm) => api.post('/auth/register/', { email, first_name: firstName, last_name: lastName, password, password_confirm }),
   logout: () => api.post('/auth/logout/'),
 };
 

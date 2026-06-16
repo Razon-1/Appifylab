@@ -21,10 +21,10 @@ class RequestLoggingMiddleware(MiddlewareMixin):
         logger.info(f"[REQUEST] {request.method} {request.path}")
         return None
 
-    def process_response(self, response):
+    def process_response(self, request, response):
         """Log response details"""
-        if hasattr(response, '_start_time'):
-            elapsed = __import__('time').time() - response._start_time
+        if hasattr(request, '_start_time'):
+            elapsed = __import__('time').time() - request._start_time
             logger.info(
                 f"[RESPONSE] {response.status_code} {response.get('Content-Type', 'N/A')} "
                 f"in {elapsed:.2f}s"
