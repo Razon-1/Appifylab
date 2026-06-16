@@ -114,13 +114,6 @@ export default function Register({ onRegister }) {
 
   return (
     <section className="min-h-screen flex flex-col lg:flex-row bg-white">
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <section className="min-h-screen flex flex-col lg:flex-row bg-white">
       {/* Left Side - Image - Hidden on mobile, shown on lg screens */}
       <div className="hidden lg:flex lg:w-2/3 items-center justify-center p-4 lg:p-8">
         <div className="relative w-full max-w-2xl">
