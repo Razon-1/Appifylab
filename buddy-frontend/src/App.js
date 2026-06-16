@@ -105,25 +105,4 @@ function App() {
 }
 
 export default App;
-            path="/login" 
-            element={isAuthenticated ? <Navigate to="/feed" /> : <Login onLogin={login} />} 
-          />
-          <Route 
-            path="/register" 
-            element={isAuthenticated ? <Navigate to="/feed" /> : <Register onRegister={login} />} 
-          />
-          <Route 
-            path="/feed" 
-            element={isAuthenticated ? <Feed /> : <Navigate to="/login" />} 
-          />
-          <Route 
-            path="/" 
-            element={<Navigate to={isAuthenticated ? "/feed" : "/login"} />} 
-          />
-        </Routes>
-      </Router>
-    </AuthContext.Provider>
-  );
-}
 
-export default App;
