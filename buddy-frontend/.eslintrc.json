@@ -1,0 +1,8 @@
+// .eslintrc.json
+{
+  "extends": "react-app",
+  "rules": {
+    "no-unused-vars": "warn",
+    "no-console": "warn"
+  }
+}

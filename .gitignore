@@ -1,0 +1,79 @@
+# Backend - Django Specific
+*.py[cod]
+*$py.class
+__pycache__/
+*.egg-info/
+dist/
+build/
+*.egg
+.Python
+venv/
+env/
+ENV/
+.venv
+
+# Django specific
+*.log
+local_settings.py
+db.sqlite3
+/media
+/staticfiles
+.env
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Frontend - React Specific
+# dependencies
+buddy-frontend/node_modules
+buddy-frontend/.pnp
+buddy-frontend/.pnp.js
+
+# testing
+buddy-frontend/coverage
+
+# production
+buddy-frontend/build
+buddy-frontend/dist
+
+# misc
+buddy-frontend/.env.local
+buddy-frontend/.env.development.local
+buddy-frontend/.env.test.local
+buddy-frontend/.env.production.local
+buddy-frontend/.env
+buddy-frontend/npm-debug.log*
+buddy-frontend/yarn-debug.log*
+buddy-frontend/yarn-error.log*
+
+# IDE
+buddy-frontend/.vscode
+buddy-frontend/.idea
+buddy-frontend/*.swp
+buddy-frontend/*.swo
+buddy-frontend/*~
+buddy-frontend/.DS_Store
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Log files
+logs/
+*.log
+
+# Temporary files
+temp/
+tmp/
+*.tmp
