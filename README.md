@@ -2,6 +2,10 @@
 
 A modern, professional full-stack social networking platform built with **React**, **Django REST Framework**, **Tailwind CSS**, and **MySQL**.
 
+## Project Demo
+
+Watch the project demonstration: [YouTube Demo](https://youtu.be/TG-g53FY-wE)
+
 ## Clone from Git
 
 ```bash
