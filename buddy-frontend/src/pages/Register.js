@@ -53,7 +53,7 @@ export default function Register({ onRegister }) {
 
     try {
       const response = await authAPI.register(email, firstName, lastName, password, confirmPassword);
-      const data = response.data;
+      const data = response.data.data || response.data;
       onRegister(data);
       navigate('/feed');
     } catch (err) {

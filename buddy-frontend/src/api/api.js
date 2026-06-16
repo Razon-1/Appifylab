@@ -13,7 +13,7 @@ const api = axios.create({
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('authToken');
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    config.headers.Authorization = `Token ${token}`;
   }
   return config;
 });
@@ -30,9 +30,25 @@ export const authAPI = {
 // Feed endpoints
 export const feedAPI = {
   getPosts: () => api.get('/feed/posts/'),
-  createPost: (content) => api.post('/feed/posts/', { content }),
+  createPost: (formData) => api.post('/feed/posts/', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  }),
+  updatePost: (postId, formData) => api.patch(`/feed/posts/${postId}/`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  }),
+  deletePost: (postId) => api.delete(`/feed/posts/${postId}/`),
   likePost: (postId) => api.post(`/feed/posts/${postId}/like/`),
-  commentPost: (postId, content) => api.post(`/feed/posts/${postId}/comments/`, { content }),
+  getPostLikes: (postId) => api.get(`/feed/posts/${postId}/liked_by/`),
+  getComments: (postId) => api.get(`/feed/comments/?post=${postId}`),
+  createComment: (postId, content) => api.post('/feed/comments/', { post: postId, content }),
+  createReply: (postId, parentCommentId, content) =>
+    api.post('/feed/comments/', { post: postId, parent: parentCommentId, content }),
+  likeComment: (commentId) => api.post(`/feed/comments/${commentId}/like/`),
+  getCommentLikes: (commentId) => api.get(`/feed/comments/${commentId}/liked_by/`),
 };
 
 // User endpoints

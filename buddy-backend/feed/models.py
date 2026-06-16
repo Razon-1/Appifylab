@@ -33,7 +33,7 @@ class Post(models.Model):
     
     def get_liked_by_users(self):
         """Get list of users who liked this post"""
-        return self.likes.values('id', 'username', 'profile_picture')
+        return self.likes.values('id', 'username', 'email', 'first_name', 'last_name')
 
 
 class Comment(models.Model):
@@ -65,4 +65,4 @@ class Comment(models.Model):
     
     def get_liked_by_users(self):
         """Get list of users who liked this comment"""
-        return self.likes.values('id', 'username', 'profile_picture')
+        return self.likes.values('id', 'username', 'email', 'first_name', 'last_name')

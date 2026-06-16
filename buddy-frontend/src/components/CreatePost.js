@@ -1,10 +1,10 @@
 /**
  * Create Post Component
- * Allows users to create posts with text, images, and privacy settings
+ * Allows users to create posts with text, images, and privacy settings.
  */
 
-import React, { useState } from 'react';
-import { feedAPI } from '../services/apiClient';
+import React, { useRef, useState } from 'react';
+import { feedAPI } from '../api/api';
 
 export default function CreatePost({ onPostCreated, darkMode = false }) {
   const [content, setContent] = useState('');
@@ -13,39 +13,34 @@ export default function CreatePost({ onPostCreated, darkMode = false }) {
   const [privacy, setPrivacy] = useState('public');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const fileInputRef = React.useRef(null);
+  const fileInputRef = useRef(null);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        setError('Image size must be less than 5MB');
-        return;
-      }
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        setError('File must be an image');
-        return;
-      }
-      setImage(file);
-      setError(null);
-      
-      // Create preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Image size must be less than 5MB');
+      return;
     }
+
+    if (!file.type.startsWith('image/')) {
+      setError('File must be an image');
+      return;
+    }
+
+    setImage(file);
+    setError(null);
+
+    const reader = new FileReader();
+    reader.onloadend = () => setImagePreview(reader.result);
+    reader.readAsDataURL(file);
   };
 
   const handleRemoveImage = () => {
     setImage(null);
     setImagePreview(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleSubmit = async (e) => {
@@ -59,27 +54,22 @@ export default function CreatePost({ onPostCreated, darkMode = false }) {
     setError(null);
     try {
       const formData = new FormData();
-      formData.append('content', content);
+      formData.append('content', content.trim());
       formData.append('privacy', privacy);
-      if (image) {
-        formData.append('image', image);
-      }
+      if (image) formData.append('image', image);
 
       const response = await feedAPI.createPost(formData);
-      
-      // Reset form
+      const createdPost = response.data?.data;
+
       setContent('');
       setImage(null);
       setImagePreview(null);
       setPrivacy('public');
-      
-      // Callback with new post
-      if (onPostCreated) {
-        onPostCreated(response.data);
-      }
+      if (fileInputRef.current) fileInputRef.current.value = '';
+
+      if (createdPost && onPostCreated) onPostCreated(createdPost);
     } catch (err) {
-      setError(err.message || 'Failed to create post');
-      console.error('Failed to create post:', err);
+      setError(err.response?.data?.message || err.message || 'Failed to create post');
     } finally {
       setLoading(false);
     }
@@ -92,9 +82,8 @@ export default function CreatePost({ onPostCreated, darkMode = false }) {
           {error}
         </div>
       )}
-      
+
       <form onSubmit={handleSubmit}>
-        {/* Text Area */}
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
@@ -105,29 +94,22 @@ export default function CreatePost({ onPostCreated, darkMode = false }) {
           rows="4"
         />
 
-        {/* Image Preview */}
         {imagePreview && (
           <div className="mt-4 relative inline-block">
-            <img
-              src={imagePreview}
-              alt="Preview"
-              className="max-h-64 rounded-lg"
-            />
+            <img src={imagePreview} alt="Preview" className="max-h-64 rounded-lg" />
             <button
               type="button"
               onClick={handleRemoveImage}
               className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600"
+              aria-label="Remove image"
             >
-              ✕
+              X
             </button>
           </div>
         )}
 
-        {/* Controls */}
         <div className="flex items-center justify-between mt-4 flex-wrap gap-4">
-          {/* Left Actions */}
           <div className="flex gap-2">
-            {/* Image Upload */}
             <input
               ref={fileInputRef}
               type="file"
@@ -138,28 +120,23 @@ export default function CreatePost({ onPostCreated, darkMode = false }) {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition"
-              title="Upload image"
+              className="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition"
             >
-              📷
+              Image
             </button>
-            
-            {/* Privacy Selector */}
+
             <select
               value={privacy}
               onChange={(e) => setPrivacy(e.target.value)}
               className={`px-3 py-2 rounded border ${
-                darkMode
-                  ? 'bg-gray-700 border-gray-600 text-white'
-                  : 'bg-white border-gray-200'
+                darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-200'
               } focus:outline-none focus:ring-2 focus:ring-blue-500`}
             >
-              <option value="public">🌐 Public</option>
-              <option value="private">🔒 Private</option>
+              <option value="public">Public</option>
+              <option value="private">Private</option>
             </select>
           </div>
 
-          {/* Right Action */}
           <button
             type="submit"
             disabled={loading || !content.trim()}

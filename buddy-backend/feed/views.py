@@ -199,7 +199,7 @@ class PostViewSet(viewsets.ModelViewSet):
         """Get list of users who liked this post"""
         try:
             post = self.get_object()
-            liked_users = post.likes.values('id', 'username', 'profile_picture')
+            liked_users = post.likes.values('id', 'username', 'email', 'first_name', 'last_name')
             return APIResponse.success(
                 data=list(liked_users),
                 message=f"{post.likes.count()} users liked this post"
@@ -374,7 +374,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         """Get users who liked this comment"""
         try:
             comment = self.get_object()
-            liked_users = comment.likes.values('id', 'username', 'profile_picture')
+            liked_users = comment.likes.values('id', 'username', 'email', 'first_name', 'last_name')
             return APIResponse.success(
                 data=list(liked_users),
                 message=f"{comment.likes.count()} users liked this comment"

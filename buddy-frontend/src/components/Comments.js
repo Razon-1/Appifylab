@@ -1,32 +1,37 @@
 /**
  * Comments Component
- * Displays comments and replies for a post
+ * Displays comments and replies for a post.
  */
 
-import React, { useState, useEffect } from 'react';
-import { feedAPI } from '../services/apiClient';
+import React, { useCallback, useEffect, useState } from 'react';
+import { feedAPI } from '../api/api';
+
+const getUsersText = (users = []) => {
+  if (!users.length) return 'No likes yet';
+  return users.map((user) => user.username || user.email || 'Unknown').join(', ');
+};
 
 export default function Comments({ postId, darkMode, onCommentAdded }) {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
   const [replyText, setReplyText] = useState('');
   const [replyingTo, setReplyingTo] = useState(null);
+  const [expandedLikes, setExpandedLikes] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchComments();
-  }, [postId]);
-
-  const fetchComments = async () => {
+  const fetchComments = useCallback(async () => {
     try {
       const response = await feedAPI.getComments(postId);
-      setComments(response.data);
+      setComments(response.data?.data || []);
     } catch (err) {
-      setError(err.message);
-      console.error('Failed to fetch comments:', err);
+      setError(err.response?.data?.message || err.message || 'Failed to load comments');
     }
-  };
+  }, [postId]);
+
+  useEffect(() => {
+    fetchComments();
+  }, [fetchComments]);
 
   const handleAddComment = async (e) => {
     e.preventDefault();
@@ -35,15 +40,12 @@ export default function Comments({ postId, darkMode, onCommentAdded }) {
     setLoading(true);
     setError(null);
     try {
-      await feedAPI.createComment(postId, newComment);
+      await feedAPI.createComment(postId, newComment.trim());
       setNewComment('');
-      fetchComments();
-      if (onCommentAdded) {
-        onCommentAdded();
-      }
+      await fetchComments();
+      if (onCommentAdded) onCommentAdded();
     } catch (err) {
-      setError(err.message);
-      console.error('Failed to add comment:', err);
+      setError(err.response?.data?.message || err.message || 'Failed to add comment');
     } finally {
       setLoading(false);
     }
@@ -56,13 +58,13 @@ export default function Comments({ postId, darkMode, onCommentAdded }) {
     setLoading(true);
     setError(null);
     try {
-      await feedAPI.createReply(parentCommentId, replyText);
+      await feedAPI.createReply(postId, parentCommentId, replyText.trim());
       setReplyText('');
       setReplyingTo(null);
-      fetchComments();
+      await fetchComments();
+      if (onCommentAdded) onCommentAdded();
     } catch (err) {
-      setError(err.message);
-      console.error('Failed to add reply:', err);
+      setError(err.response?.data?.message || err.message || 'Failed to add reply');
     } finally {
       setLoading(false);
     }
@@ -71,11 +73,47 @@ export default function Comments({ postId, darkMode, onCommentAdded }) {
   const handleLikeComment = async (commentId) => {
     try {
       await feedAPI.likeComment(commentId);
-      fetchComments();
+      await fetchComments();
     } catch (err) {
-      console.error('Failed to like comment:', err);
+      setError(err.response?.data?.message || err.message || 'Failed to update like');
     }
   };
+
+  const toggleLikedBy = async (commentId) => {
+    if (expandedLikes[commentId]) {
+      setExpandedLikes((current) => ({ ...current, [commentId]: null }));
+      return;
+    }
+
+    try {
+      const response = await feedAPI.getCommentLikes(commentId);
+      setExpandedLikes((current) => ({
+        ...current,
+        [commentId]: response.data?.data || [],
+      }));
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || 'Failed to load likes');
+    }
+  };
+
+  const renderLikeSummary = (item) => (
+    <>
+      {item.likes_count > 0 && (
+        <button
+          type="button"
+          onClick={() => toggleLikedBy(item.id)}
+          className={darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-900'}
+        >
+          Liked by
+        </button>
+      )}
+      {expandedLikes[item.id] && (
+        <p className={`mt-2 text-xs ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+          Liked by: {getUsersText(expandedLikes[item.id])}
+        </p>
+      )}
+    </>
+  );
 
   return (
     <div className={`mt-6 pt-6 border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
@@ -87,7 +125,6 @@ export default function Comments({ postId, darkMode, onCommentAdded }) {
         </div>
       )}
 
-      {/* Add Comment Form */}
       <form onSubmit={handleAddComment} className="mb-6">
         <textarea
           value={newComment}
@@ -107,25 +144,13 @@ export default function Comments({ postId, darkMode, onCommentAdded }) {
         </button>
       </form>
 
-      {/* Comments List */}
       <div className="space-y-4">
         {comments.map((comment) => (
-          <div
-            key={comment.id}
-            className={`p-4 rounded ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}
-          >
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <p className="font-semibold text-sm">{comment.author?.username || 'Unknown'}</p>
-                <p className="text-xs text-gray-500">
-                  {new Date(comment.created_at).toLocaleDateString()}
-                </p>
-              </div>
-            </div>
+          <div key={comment.id} className={`p-4 rounded ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+            <p className="font-semibold text-sm">{comment.author?.username || 'Unknown'}</p>
+            <p className="text-xs text-gray-500">{new Date(comment.created_at).toLocaleDateString()}</p>
+            <p className="mt-2 text-sm break-words">{comment.content}</p>
 
-            <p className="mt-2 text-sm">{comment.content}</p>
-
-            {/* Comment Actions */}
             <div className="flex gap-4 mt-3 text-xs">
               <button
                 onClick={() => handleLikeComment(comment.id)}
@@ -137,9 +162,9 @@ export default function Comments({ postId, darkMode, onCommentAdded }) {
                     : 'text-gray-600 hover:text-red-500'
                 }`}
               >
-                {comment.is_liked ? '❤️' : '🤍'} {comment.likes_count}
+                {comment.is_liked ? 'Unlike' : 'Like'} {comment.likes_count}
               </button>
-
+              {renderLikeSummary(comment)}
               <button
                 onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
                 className={darkMode ? 'text-gray-400 hover:text-blue-400' : 'text-gray-600 hover:text-blue-500'}
@@ -148,8 +173,7 @@ export default function Comments({ postId, darkMode, onCommentAdded }) {
               </button>
             </div>
 
-            {/* Replies */}
-            {comment.replies && comment.replies.length > 0 && (
+            {comment.replies?.length > 0 && (
               <div className="mt-4 ml-4 space-y-3 border-l-2 border-gray-400 pl-4">
                 {comment.replies.map((reply) => (
                   <div key={reply.id} className={`p-3 rounded ${darkMode ? 'bg-gray-600' : 'bg-gray-200'}`}>
@@ -157,25 +181,27 @@ export default function Comments({ postId, darkMode, onCommentAdded }) {
                     <p className="text-xs text-gray-500 mb-2">
                       {new Date(reply.created_at).toLocaleDateString()}
                     </p>
-                    <p className="text-sm">{reply.content}</p>
-                    <button
-                      onClick={() => handleLikeComment(reply.id)}
-                      className={`mt-2 text-xs transition ${
-                        reply.is_liked
-                          ? 'text-red-500 font-semibold'
-                          : darkMode
-                          ? 'text-gray-400 hover:text-red-500'
-                          : 'text-gray-600 hover:text-red-500'
-                      }`}
-                    >
-                      {reply.is_liked ? '❤️' : '🤍'} {reply.likes_count}
-                    </button>
+                    <p className="text-sm break-words">{reply.content}</p>
+                    <div className="flex gap-4 mt-2 text-xs">
+                      <button
+                        onClick={() => handleLikeComment(reply.id)}
+                        className={`transition ${
+                          reply.is_liked
+                            ? 'text-red-500 font-semibold'
+                            : darkMode
+                            ? 'text-gray-400 hover:text-red-500'
+                            : 'text-gray-600 hover:text-red-500'
+                        }`}
+                      >
+                        {reply.is_liked ? 'Unlike' : 'Like'} {reply.likes_count}
+                      </button>
+                      {renderLikeSummary(reply)}
+                    </div>
                   </div>
                 ))}
               </div>
             )}
 
-            {/* Reply Form */}
             {replyingTo === comment.id && (
               <form onSubmit={(e) => handleAddReply(e, comment.id)} className="mt-4">
                 <textarea

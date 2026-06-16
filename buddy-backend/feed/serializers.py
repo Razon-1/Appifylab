@@ -10,14 +10,18 @@ class LikeCountSerializer(serializers.Serializer):
     """Serializer for like information"""
     id = serializers.IntegerField()
     username = serializers.CharField()
-    profile_picture = serializers.URLField(allow_null=True)
+    email = serializers.EmailField(required=False, allow_blank=True)
+    first_name = serializers.CharField(required=False, allow_blank=True)
+    last_name = serializers.CharField(required=False, allow_blank=True)
 
 
 class CommentLikeSerializer(serializers.Serializer):
     """Serializer for comment/reply likes"""
     id = serializers.IntegerField()
     username = serializers.CharField()
-    profile_picture = serializers.URLField(allow_null=True)
+    email = serializers.EmailField(required=False, allow_blank=True)
+    first_name = serializers.CharField(required=False, allow_blank=True)
+    last_name = serializers.CharField(required=False, allow_blank=True)
 
 
 class CommentReplySerializer(serializers.ModelSerializer):

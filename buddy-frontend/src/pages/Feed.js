@@ -7,9 +7,10 @@ import CreatePost from '../components/CreatePost';
 
 export default function Feed() {
   const navigate = useNavigate();
-  const { logout, user } = useContext(AuthContext);
+  const { logout } = useContext(AuthContext);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -21,22 +22,22 @@ export default function Feed() {
 
   const fetchPosts = async () => {
     try {
+      setError(null);
       const response = await feedAPI.getPosts();
-      setPosts(response.data);
+      setPosts(response.data?.data || response.data?.results || []);
     } catch (err) {
-      console.error('Failed to fetch posts:', err);
+      setError(err.response?.data?.message || err.message || 'Failed to load feed');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCreatePost = async (content) => {
-    try {
-      await feedAPI.createPost(content);
-      fetchPosts();
-    } catch (err) {
-      console.error('Failed to create post:', err);
-    }
+  const handlePostCreated = (post) => {
+    setPosts((currentPosts) => [post, ...currentPosts]);
+  };
+
+  const handlePostDeleted = (postId) => {
+    setPosts((currentPosts) => currentPosts.filter((post) => post.id !== postId));
   };
 
   const handleLogout = () => {
@@ -188,17 +189,28 @@ export default function Feed() {
         {/* Center - Main Feed */}
         <main className="flex-1 md:flex-1 lg:max-w-2xl">
           {/* Create Post */}
-          <CreatePost onPostCreate={handleCreatePost} darkMode={darkMode} />
+          <CreatePost onPostCreated={handlePostCreated} darkMode={darkMode} />
 
           {/* Posts Feed */}
           <div className="mt-4 md:mt-6 space-y-4 md:space-y-6">
+            {error && (
+              <div className="rounded-lg bg-red-100 border border-red-400 text-red-700 px-4 py-3">
+                {error}
+              </div>
+            )}
             {loading ? (
               <div className="flex justify-center py-12">
                 <div className={`animate-spin rounded-full h-12 w-12 border-b-2 border-primary`}></div>
               </div>
             ) : posts.length > 0 ? (
               posts.map((post) => (
-                <PostCard key={post.id} post={post} darkMode={darkMode} />
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  darkMode={darkMode}
+                  onPostDeleted={handlePostDeleted}
+                  onRefresh={fetchPosts}
+                />
               ))
             ) : (
               <div className={`rounded-lg shadow p-8 text-center ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>

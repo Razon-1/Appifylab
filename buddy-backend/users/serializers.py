@@ -52,7 +52,14 @@ class LoginSerializer(serializers.Serializer):
         return data
 
 class AuthTokenSerializer(serializers.Serializer):
+    token = serializers.CharField(read_only=True)
     user = UserSerializer(read_only=True)
     
-    def get_user(self, obj):
-        return UserSerializer(obj['user']).data
+    def to_representation(self, instance):
+        from rest_framework.authtoken.models import Token
+        user = instance.get('user')
+        token, _ = Token.objects.get_or_create(user=user)
+        return {
+            'token': token.key,
+            'user': UserSerializer(user).data
+        }
