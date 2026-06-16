@@ -11,11 +11,10 @@ export default function Feed() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     fetchPosts();
-    // Check dark mode preference
     const isDark = localStorage.getItem('darkMode') === 'true';
     setDarkMode(isDark);
   }, []);
@@ -34,7 +33,7 @@ export default function Feed() {
   const handleCreatePost = async (content) => {
     try {
       await feedAPI.createPost(content);
-      fetchPosts(); // Refresh posts
+      fetchPosts();
     } catch (err) {
       console.error('Failed to create post:', err);
     }
@@ -49,276 +48,235 @@ export default function Feed() {
     const newDarkMode = !darkMode;
     setDarkMode(newDarkMode);
     localStorage.setItem('darkMode', newDarkMode);
-    document.documentElement.setAttribute('data-theme', newDarkMode ? 'dark' : 'light');
   };
 
   return (
-    <div className={`_main_layout ${darkMode ? '_dark_mode' : ''}`}>
-      {/* Header/Navbar */}
-      <nav className="navbar navbar-expand-lg bg-body sticky-top _layout_top_bar">
-        <div className="container-fluid">
-          {/* Logo */}
-          <a className="navbar-brand" href="/feed">
-            <img src="/assets/images/logo.svg" alt="Logo" className="_navbar_logo" />
+    <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'} transition-colors duration-300`}>
+      {/* Mobile Header */}
+      <div className="md:hidden sticky top-0 z-50 bg-white dark:bg-gray-800 shadow">
+        <div className="flex items-center justify-between px-4 py-3">
+          <img src="/assets/images/logo.svg" alt="Logo" className="h-8 w-auto" />
+          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+        {mobileMenuOpen && (
+          <div className="border-t border-gray-200 dark:border-gray-700 p-4 space-y-2">
+            <a href="/feed" className="block px-4 py-2 text-primary font-semibold">Home</a>
+            <button onClick={toggleDarkMode} className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
+              {darkMode ? 'Light Mode' : 'Dark Mode'}
+            </button>
+            <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
+              Logout
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Desktop Header/Navbar */}
+      <nav className="hidden md:flex sticky top-0 z-50 bg-white dark:bg-gray-800 shadow items-center justify-between px-4 md:px-6 lg:px-8 py-4">
+        {/* Logo */}
+        <div className="flex-shrink-0">
+          <a href="/feed">
+            <img src="/assets/images/logo.svg" alt="Logo" className="h-10 w-auto" />
+          </a>
+        </div>
+
+        {/* Search Bar - Hidden on small tablets */}
+        <div className="hidden lg:flex flex-1 mx-8">
+          <input
+            type="text"
+            placeholder="Search friends, posts..."
+            className="w-full max-w-md px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-gray-50 dark:bg-gray-700"
+          />
+        </div>
+
+        {/* Right Menu Items */}
+        <div className="flex items-center gap-2 md:gap-3 lg:gap-4">
+          {/* Home */}
+          <a href="/feed" className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition" title="Home">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-3m0 0l7-4 7 4M5 9v10a1 1 0 001 1h12a1 1 0 001-1V9m-9 11l4-4m-9-3l-4.147-4.147a1 1 0 011.414-1.414L12 7.586l7.146-7.146a1 1 0 011.414 1.414L13.414 9m0 0L9 13.414" />
+            </svg>
           </a>
 
-          {/* Toggler for mobile */}
-          <button 
-            className="navbar-toggler" 
-            type="button" 
-            data-bs-toggle="collapse" 
-            data-bs-target="#navbarContent"
+          {/* Friend Requests - Hidden on small screens */}
+          <a href="#" className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition hidden sm:block relative" title="Friend Requests">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-2a6 6 0 0112 0v2zm0 0h6v-2a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+            <span className="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">2</span>
+          </a>
+
+          {/* Notifications - Hidden on small screens */}
+          <a href="#" className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition hidden sm:block relative" title="Notifications">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
+            <span className="absolute top-1 right-1 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
+          </a>
+
+          {/* Dark Mode Toggle */}
+          <button
+            onClick={toggleDarkMode}
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+            title="Toggle dark mode"
           >
-            <span className="navbar-toggler-icon"></span>
+            {darkMode ? (
+              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 18a6 6 0 100-12 6 6 0 000 12z" />
+                <path d="M12 1v6m0 6v6M4.22 4.22l4.24 4.24m3.08 3.08l4.24 4.24M1 12h6m6 0h6m-16.78 7.78l4.24-4.24m3.08-3.08l4.24-4.24" />
+              </svg>
+            ) : (
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            )}
           </button>
 
-          {/* Navbar Content */}
-          <div className="collapse navbar-collapse" id="navbarContent">
-            {/* Search Bar */}
-            <div className="_layout_top_bar_search_area mx-auto">
-              <input 
-                type="text" 
-                className="form-control _layout_top_bar_search_input" 
-                placeholder="Search friends, posts..." 
-              />
-            </div>
-
-            {/* Right side items */}
-            <div className="d-flex align-items-center ms-auto gap-2">
-              {/* Home */}
-              <a href="/feed" className="btn btn-sm _layout_top_bar_btn">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                  <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                </svg>
-              </a>
-
-              {/* Friend Requests */}
-              <a href="#" className="btn btn-sm _layout_top_bar_btn">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="9" cy="7" r="4"></circle>
-                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                </svg>
-                <span className="badge bg-danger">2</span>
-              </a>
-
-              {/* Notifications */}
-              <div className="dropdown">
-                <button 
-                  className="btn btn-sm _layout_top_bar_btn dropdown-toggle" 
-                  type="button" 
-                  id="notificationDropdown"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                  </svg>
-                  <span className="badge bg-info">3</span>
-                </button>
-                <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown">
-                  <li><h6 className="dropdown-header">Notifications</h6></li>
-                  <li><a className="dropdown-item" href="#"><small>John liked your post</small></a></li>
-                  <li><a className="dropdown-item" href="#"><small>Sarah commented on your post</small></a></li>
-                  <li><a className="dropdown-item" href="#"><small>New friend request from Alex</small></a></li>
-                </ul>
-              </div>
-
-              {/* Dark Mode Toggle */}
-              <button 
-                className="btn btn-sm _layout_top_bar_btn"
-                onClick={toggleDarkMode}
-                title="Toggle dark mode"
-              >
-                {darkMode ? (
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                    <circle cx="12" cy="12" r="5"></circle>
-                    <line x1="12" y1="1" x2="12" y2="3"></line>
-                    <line x1="12" y1="21" x2="12" y2="23"></line>
-                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                    <line x1="1" y1="12" x2="3" y2="12"></line>
-                    <line x1="21" y1="12" x2="23" y2="12"></line>
-                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                  </svg>
-                ) : (
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                  </svg>
-                )}
-              </button>
-
-              {/* User Profile */}
-              <div className="dropdown">
-                <button 
-                  className="btn btn-sm _layout_top_bar_btn dropdown-toggle" 
-                  type="button"
-                  id="profileDropdown"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  <img src="/assets/images/Avatar.png" alt="Profile" className="_navbar_avatar" />
-                </button>
-                <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                  <li><a className="dropdown-item" href="#">Profile</a></li>
-                  <li><a className="dropdown-item" href="#">Settings</a></li>
-                  <li><hr className="dropdown-divider" /></li>
-                  <li><a className="dropdown-item" href="#" onClick={handleLogout}>Logout</a></li>
-                </ul>
-              </div>
+          {/* Profile Dropdown */}
+          <div className="relative group">
+            <button className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+              <img src="/assets/images/Avatar.png" alt="Profile" className="w-8 h-8 rounded-full object-cover" />
+            </button>
+            <div className="hidden group-hover:block absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 z-50">
+              <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Profile</a>
+              <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Settings</a>
+              <hr className="my-2 dark:border-gray-700" />
+              <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700">Logout</button>
             </div>
           </div>
         </div>
       </nav>
 
-      {/* Main Content Layout */}
-      <div className="_layout_inner_wrap">
-        <div className="container-fluid">
-          <div className="row">
-            {/* Left Sidebar */}
-            <div className="col-xl-2 col-lg-3 col-md-12 _layout_left_wrap">
-              <div className="_layout_left_sidebar_wrap">
-                <div className="_layout_sidebar_menu">
-                  <ul className="list-unstyled">
-                    <li className="mb-3">
-                      <a href="/feed" className="_sidebar_link _active">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                          <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                        </svg>
-                        <span>Home</span>
-                      </a>
-                    </li>
-                    <li className="mb-3">
-                      <a href="#" className="_sidebar_link">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                          <circle cx="9" cy="7" r="4"></circle>
-                          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                        </svg>
-                        <span>Friends</span>
-                      </a>
-                    </li>
-                    <li className="mb-3">
-                      <a href="#" className="_sidebar_link">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <circle cx="11" cy="11" r="8"></circle>
-                          <path d="m21 21-4.35-4.35"></path>
-                        </svg>
-                        <span>Explore</span>
-                      </a>
-                    </li>
-                    <li className="mb-3">
-                      <a href="#" className="_sidebar_link">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                          <line x1="9" y1="9" x2="15" y2="9"></line>
-                          <line x1="9" y1="15" x2="15" y2="15"></line>
-                        </svg>
-                        <span>Messages</span>
-                      </a>
-                    </li>
-                  </ul>
+      {/* Main Content */}
+      <div className="flex flex-col md:flex-row gap-4 md:gap-6 lg:gap-8 p-4 md:p-6 lg:p-8 max-w-8xl mx-auto">
+        {/* Left Sidebar - Hidden on mobile */}
+        <aside className="hidden md:block md:w-48 lg:w-56">
+          <div className={`sticky top-24 p-4 rounded-lg ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow`}>
+            <nav className="space-y-2">
+              <a href="/feed" className="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-primary text-white font-medium">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-3m0 0l7-4 7 4M5 9v10a1 1 0 001 1h12a1 1 0 001-1V9m-9 11l4-4m-9-3l-4.147-4.147a1 1 0 011.414-1.414L12 7.586l7.146-7.146a1 1 0 011.414 1.414L13.414 9m0 0L9 13.414" />
+                </svg>
+                Home
+              </a>
+              <a href="#" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition hover:${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-2a6 6 0 0112 0v2zm0 0h6v-2a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+                Friends
+              </a>
+              <a href="#" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition hover:${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                Explore
+              </a>
+              <a href="#" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition hover:${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8s-9-3.582-9-8 4.03-8 9-8 9 3.582 9 8z" />
+                </svg>
+                Messages
+              </a>
+            </nav>
+          </div>
+        </aside>
+
+        {/* Center - Main Feed */}
+        <main className="flex-1 md:flex-1 lg:max-w-2xl">
+          {/* Create Post */}
+          <CreatePost onPostCreate={handleCreatePost} darkMode={darkMode} />
+
+          {/* Posts Feed */}
+          <div className="mt-4 md:mt-6 space-y-4 md:space-y-6">
+            {loading ? (
+              <div className="flex justify-center py-12">
+                <div className={`animate-spin rounded-full h-12 w-12 border-b-2 border-primary`}></div>
+              </div>
+            ) : posts.length > 0 ? (
+              posts.map((post) => (
+                <PostCard key={post.id} post={post} darkMode={darkMode} />
+              ))
+            ) : (
+              <div className={`rounded-lg shadow p-8 text-center ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                <p className="text-gray-500">No posts yet. Be the first to share!</p>
+              </div>
+            )}
+          </div>
+        </main>
+
+        {/* Right Sidebar - Hidden on small/medium screens */}
+        <aside className="hidden lg:block lg:w-64">
+          <div className="sticky top-24 space-y-4">
+            {/* Online Friends */}
+            <div className={`p-4 rounded-lg shadow ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
+              <h3 className="font-bold text-lg mb-4">Online Friends</h3>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <img src="/assets/images/Avatar.png" alt="" className="w-10 h-10 rounded-full object-cover" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">John Doe</p>
+                    <p className="text-xs text-gray-500">Active now</p>
+                  </div>
+                  <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <img src="/assets/images/Avatar.png" alt="" className="w-10 h-10 rounded-full object-cover" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">Sarah Smith</p>
+                    <p className="text-xs text-gray-500">5 min ago</p>
+                  </div>
+                  <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <img src="/assets/images/Avatar.png" alt="" className="w-10 h-10 rounded-full object-cover" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">Alex Johnson</p>
+                    <p className="text-xs text-gray-500">10 min ago</p>
+                  </div>
+                  <span className="w-3 h-3 bg-green-500 rounded-full"></span>
                 </div>
               </div>
             </div>
 
-            {/* Main Feed */}
-            <div className="col-xl-6 col-lg-6 col-md-12 _layout_middle_wrap">
-              <div className="_layout_middle_inner">
-                {/* Create Post */}
-                <CreatePost onPostCreate={handleCreatePost} darkMode={darkMode} />
-
-                {/* Posts Feed */}
-                <div className="_feed_posts_list mt-4">
-                  {loading ? (
-                    <div className="text-center py-5">
-                      <div className="spinner-border text-primary" role="status">
-                        <span className="visually-hidden">Loading...</span>
-                      </div>
-                    </div>
-                  ) : posts.length > 0 ? (
-                    posts.map((post) => (
-                      <PostCard key={post.id} post={post} darkMode={darkMode} />
-                    ))
-                  ) : (
-                    <div className="alert alert-info text-center mt-5">
-                      No posts yet. Be the first to share something!
-                    </div>
-                  )}
-                </div>
+            {/* Suggested Friends */}
+            <div className={`p-4 rounded-lg shadow ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="font-bold text-lg">Suggested Friends</h3>
+                <a href="#" className="text-primary text-sm font-medium hover:underline">See All</a>
               </div>
-            </div>
-
-            {/* Right Sidebar */}
-            <div className="col-xl-4 col-lg-3 col-md-12 _layout_right_wrap _mobile_none">
-              <div className="_layout_right_sidebar_wrap">
-                {/* Online Friends */}
-                <div className="_layout_right_box mb-4">
-                  <h6 className="mb-3">Online Friends</h6>
-                  <div className="_online_friends_list">
-                    <div className="d-flex align-items-center mb-3">
-                      <img src="/assets/images/Avatar.png" alt="" className="_friend_avatar" />
-                      <div className="flex-grow-1">
-                        <p className="mb-0 text-sm">John Doe</p>
-                        <small className="text-muted">Active now</small>
-                      </div>
-                    </div>
-                    <div className="d-flex align-items-center mb-3">
-                      <img src="/assets/images/Avatar.png" alt="" className="_friend_avatar" />
-                      <div className="flex-grow-1">
-                        <p className="mb-0 text-sm">Sarah Smith</p>
-                        <small className="text-muted">5 min ago</small>
-                      </div>
-                    </div>
-                    <div className="d-flex align-items-center mb-3">
-                      <img src="/assets/images/Avatar.png" alt="" className="_friend_avatar" />
-                      <div className="flex-grow-1">
-                        <p className="mb-0 text-sm">Alex Johnson</p>
-                        <small className="text-muted">10 min ago</small>
-                      </div>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <img src="/assets/images/Avatar.png" alt="" className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold truncate">Emma Wilson</p>
+                      <p className="text-xs text-gray-500 truncate">10 mutual friends</p>
                     </div>
                   </div>
+                  <button className="ml-2 px-3 py-1 bg-primary text-white text-xs rounded-lg hover:bg-blue-600 transition flex-shrink-0">
+                    Add
+                  </button>
                 </div>
-
-                {/* Suggested Friends */}
-                <div className="_layout_right_box">
-                  <div className="d-flex justify-content-between align-items-center mb-3">
-                    <h6>Suggested Friends</h6>
-                    <small className="text-primary cursor-pointer">See All</small>
-                  </div>
-                  <div className="_suggested_friends_list">
-                    <div className="d-flex align-items-center justify-content-between mb-3">
-                      <div className="d-flex align-items-center flex-grow-1">
-                        <img src="/assets/images/Avatar.png" alt="" className="_friend_avatar" />
-                        <div>
-                          <p className="mb-0 text-sm font-weight-bold">Emma Wilson</p>
-                          <small className="text-muted">10 mutual friends</small>
-                        </div>
-                      </div>
-                      <button className="btn btn-sm btn-primary">Add</button>
-                    </div>
-                    <div className="d-flex align-items-center justify-content-between mb-3">
-                      <div className="d-flex align-items-center flex-grow-1">
-                        <img src="/assets/images/Avatar.png" alt="" className="_friend_avatar" />
-                        <div>
-                          <p className="mb-0 text-sm font-weight-bold">Michael Brown</p>
-                          <small className="text-muted">8 mutual friends</small>
-                        </div>
-                      </div>
-                      <button className="btn btn-sm btn-primary">Add</button>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <img src="/assets/images/Avatar.png" alt="" className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold truncate">Michael Brown</p>
+                      <p className="text-xs text-gray-500 truncate">8 mutual friends</p>
                     </div>
                   </div>
+                  <button className="ml-2 px-3 py-1 bg-primary text-white text-xs rounded-lg hover:bg-blue-600 transition flex-shrink-0">
+                    Add
+                  </button>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </aside>
       </div>
     </div>
   );

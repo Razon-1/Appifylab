@@ -1,9 +1,1 @@
-import React from 'react';
-import './App.css';
-import ReactDOM from 'react-dom/client';
-
-export default function root() {
-  return (
-    <div id="root"></div>
-  );
-}
+/* App CSS - Tailwind CSS is used for styling */
