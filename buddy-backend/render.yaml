@@ -17,6 +17,14 @@ services:
       - key: ALLOWED_HOSTS
         value: "*.onrender.com,localhost"
       - key: DB_ENGINE
-        value: "django.db.backends.sqlite3"
+        value: "postgresql"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: buddy-script-db
+          property: connectionString
       - key: ENVIRONMENT
         value: "production"
+
+databases:
+  - name: buddy-script-db
+    plan: free

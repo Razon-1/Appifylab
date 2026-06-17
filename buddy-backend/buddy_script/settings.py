@@ -16,6 +16,7 @@ KEY FEATURES CONFIGURED:
 from pathlib import Path
 from decouple import config
 import os
+import dj_database_url
 
 # Configure PyMySQL as MySQLdb driver (only for MySQL)
 db_engine = os.getenv('DB_ENGINE', 'django.db.backends.sqlite3')
@@ -87,10 +88,29 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'buddy_script.wsgi.application'
 
-# Database - Support both SQLite (production) and MySQL (development)
-db_engine = config('DB_ENGINE', default='django.db.backends.sqlite3')
+# Database - Support PostgreSQL (production) and SQLite (development)
+db_engine = config('DB_ENGINE', default='sqlite3')
 
-if db_engine == 'django.db.backends.mysql':
+if db_engine == 'postgresql':
+    # Production: PostgreSQL on Render
+    db_url = config('DATABASE_URL', default='')
+    if db_url:
+        DATABASES = {
+            'default': dj_database_url.config(default=db_url, conn_max_age=600)
+        }
+    else:
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': config('DB_NAME', default='appifylab'),
+                'USER': config('DB_USER', default=''),
+                'PASSWORD': config('DB_PASSWORD', default=''),
+                'HOST': config('DB_HOST', default='localhost'),
+                'PORT': config('DB_PORT', default='5432'),
+            }
+        }
+elif db_engine == 'mysql':
+    # MySQL configuration
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
@@ -105,7 +125,7 @@ if db_engine == 'django.db.backends.mysql':
         }
     }
 else:
-    # SQLite for production (Render)
+    # Development: SQLite
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
