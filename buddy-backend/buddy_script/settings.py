@@ -53,6 +53,7 @@ ALLOWED_HOSTS = config(
     default='localhost,127.0.0.1',
     cast=parse_allowed_hosts
 )
+ALLOWED_HOSTS = list(dict.fromkeys(ALLOWED_HOSTS + ['.onrender.com']))
 
 # Application definition
 INSTALLED_APPS = [
