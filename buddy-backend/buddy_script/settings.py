@@ -173,9 +173,10 @@ REST_FRAMEWORK = {
 
 # CORS Configuration - Support both local and production URLs
 local_origins = ['http://localhost:3000', 'http://127.0.0.1:3000']
-production_origins = config('CORS_ORIGINS', default='').split(',') if config('CORS_ORIGINS', default='') else []
+production_origins = ['https://appifylab-frontend.vercel.app']  # Vercel frontend
+env_cors = config('CORS_ORIGINS', default='').split(',') if config('CORS_ORIGINS', default='') else []
 
-CORS_ALLOWED_ORIGINS = local_origins + [o.strip() for o in production_origins if o.strip()]
+CORS_ALLOWED_ORIGINS = local_origins + production_origins + [o.strip() for o in env_cors if o.strip()]
 
 CORS_ALLOW_CREDENTIALS = True
 
