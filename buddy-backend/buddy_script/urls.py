@@ -37,6 +37,6 @@ urlpatterns = [
     path('api/users/', include('users.profile_urls')),
 ]
 
-# Serve uploaded media files in development
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Serve uploaded media files. Render's free filesystem is ephemeral, so uploads may
+# disappear after redeploys/restarts unless persistent storage or S3 is added.
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

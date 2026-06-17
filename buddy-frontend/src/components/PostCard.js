@@ -41,8 +41,16 @@
  */
 
 import React, { useState } from 'react';
-import { feedAPI } from '../api/api';
+import { API_BASE_URL, feedAPI } from '../api/api';
 import Comments from './Comments';
+
+const API_ORIGIN = API_BASE_URL.replace(/\/api\/?$/, '');
+
+function getMediaUrl(url) {
+  if (!url) return '';
+  if (/^https?:\/\//i.test(url)) return url;
+  return `${API_ORIGIN}${url.startsWith('/') ? url : `/${url}`}`;
+}
 
 export default function PostCard({ post, darkMode, onPostDeleted, onRefresh }) {
   // UI state
@@ -170,7 +178,11 @@ export default function PostCard({ post, darkMode, onPostDeleted, onRefresh }) {
           <p className="mt-3 text-base leading-relaxed break-words">{post.content}</p>
 
           {post.image && (
-            <img src={post.image} alt="Post content" className="mt-4 rounded-lg max-w-full max-h-96 object-cover" />
+            <img
+              src={getMediaUrl(post.image)}
+              alt="Post content"
+              className="mt-4 rounded-lg max-w-full max-h-96 object-cover"
+            />
           )}
 
           {showLikers && (
