@@ -176,20 +176,20 @@ export default function Feed() {
           </a>
 
           {/* Friend Requests - Hidden on small screens */}
-          <a href="#" className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition hidden sm:block relative" title="Friend Requests">
+          <button type="button" className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition hidden sm:block relative" title="Friend Requests">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-2a6 6 0 0112 0v2zm0 0h6v-2a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
             <span className="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">2</span>
-          </a>
+          </button>
 
           {/* Notifications - Hidden on small screens */}
-          <a href="#" className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition hidden sm:block relative" title="Notifications">
+          <button type="button" className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition hidden sm:block relative" title="Notifications">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
             <span className="absolute top-1 right-1 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
-          </a>
+          </button>
 
           {/* Dark Mode Toggle */}
           <button
@@ -215,8 +215,8 @@ export default function Feed() {
               <img src="/assets/images/Avatar.png" alt="Profile" className="w-8 h-8 rounded-full object-cover" />
             </button>
             <div className="hidden group-hover:block absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 z-50">
-              <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Profile</a>
-              <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Settings</a>
+              <button type="button" className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Profile</button>
+              <button type="button" className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Settings</button>
               <hr className="my-2 dark:border-gray-700" />
               <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700">Logout</button>
             </div>
@@ -236,24 +236,24 @@ export default function Feed() {
                 </svg>
                 Home
               </a>
-              <a href="#" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition hover:${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+              <button type="button" className={`flex items-center gap-3 w-full px-4 py-2.5 rounded-lg transition hover:${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-2a6 6 0 0112 0v2zm0 0h6v-2a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
                 Friends
-              </a>
-              <a href="#" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition hover:${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+              </button>
+              <button type="button" className={`flex items-center gap-3 w-full px-4 py-2.5 rounded-lg transition hover:${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
                 Explore
-              </a>
-              <a href="#" className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition hover:${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+              </button>
+              <button type="button" className={`flex items-center gap-3 w-full px-4 py-2.5 rounded-lg transition hover:${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8s-9-3.582-9-8 4.03-8 9-8 9 3.582 9 8z" />
                 </svg>
                 Messages
-              </a>
+              </button>
             </nav>
           </div>
         </aside>
@@ -330,7 +330,7 @@ export default function Feed() {
             <div className={`p-4 rounded-lg shadow ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
               <div className="flex justify-between items-center mb-4">
                 <h3 className="font-bold text-lg">Suggested Friends</h3>
-                <a href="#" className="text-primary text-sm font-medium hover:underline">See All</a>
+                <button type="button" className="text-primary text-sm font-medium hover:underline">See All</button>
               </div>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">

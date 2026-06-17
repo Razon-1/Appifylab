@@ -1,14 +1,11 @@
 {
+  "framework": "create-react-app",
   "buildCommand": "npm run build",
   "outputDirectory": "build",
-  "env": {
-    "REACT_APP_API_URL": "@vercel_react_app_api_url"
-  },
-  "redirects": [
+  "rewrites": [
     {
-      "source": "/(.+)",
-      "destination": "/",
-      "permanent": false
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
