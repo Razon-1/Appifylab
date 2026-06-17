@@ -105,8 +105,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'buddy_script.wsgi.application'
 
-AUTH_USER_MODEL = 'users.User'
-
 # Database - Support PostgreSQL (production) and SQLite (development)
 db_engine = config('DB_ENGINE', default='sqlite3')
 
