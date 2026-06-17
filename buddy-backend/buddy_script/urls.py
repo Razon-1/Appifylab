@@ -15,8 +15,17 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import JsonResponse
+
+
+def health_check(request):
+    return JsonResponse({
+        'status': 'ok',
+        'service': 'buddy-script-api',
+    })
 
 urlpatterns = [
+    path('', health_check, name='health-check'),
     path('admin/', admin.site.urls),
     # User authentication endpoints (register, login, logout)
     path('api/auth/', include('users.urls')),
