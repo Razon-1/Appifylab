@@ -40,10 +40,10 @@ User = get_user_model()
 if not User.objects.filter(username='admin').exists():
     User.objects.create_superuser(
         username='admin',
-        email='admin@buddyscript.com',
+        email='admin@admin.com',
         password='admin123'
     )
-    print("Admin user created successfully")
+    print("Admin user created successfully: admin@admin.com")
 else:
     print("Admin user already exists")
 

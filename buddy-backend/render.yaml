@@ -8,6 +8,7 @@ services:
       pip install -r requirements.txt
       python manage.py migrate --no-input
       python manage.py collectstatic --no-input
+      python create_admin.py
     startCommand: gunicorn buddy_script.wsgi:application --bind 0.0.0.0:$PORT
     envVars:
       - key: DEBUG
