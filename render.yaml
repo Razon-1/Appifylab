@@ -3,6 +3,7 @@ services:
     name: buddy-script-api
     runtime: python
     plan: free
+    rootDir: buddy-backend
     buildCommand: |
       pip install -r requirements.txt
       python manage.py migrate --no-input

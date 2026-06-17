@@ -36,7 +36,11 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-dev-key-change-in-pro
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=lambda v: [s.strip() for s in v.split(',')])
+ALLOWED_HOSTS = config(
+    'ALLOWED_HOSTS',
+    default='localhost,127.0.0.1',
+    cast=lambda v: [s.strip() for s in v.split(',') if s.strip()]
+)
 
 # Application definition
 INSTALLED_APPS = [
@@ -87,6 +91,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'buddy_script.wsgi.application'
+
+AUTH_USER_MODEL = 'users.User'
 
 # Database - Support PostgreSQL (production) and SQLite (development)
 db_engine = config('DB_ENGINE', default='sqlite3')
@@ -177,6 +183,11 @@ production_origins = ['https://appifylab-frontend.vercel.app']  # Vercel fronten
 env_cors = config('CORS_ORIGINS', default='').split(',') if config('CORS_ORIGINS', default='') else []
 
 CORS_ALLOWED_ORIGINS = local_origins + production_origins + [o.strip() for o in env_cors if o.strip()]
+
+CSRF_TRUSTED_ORIGINS = [
+    origin for origin in CORS_ALLOWED_ORIGINS
+    if origin.startswith('https://') or origin.startswith('http://')
+]
 
 CORS_ALLOW_CREDENTIALS = True
 
