@@ -17,9 +17,14 @@ from pathlib import Path
 from decouple import config
 import os
 
-# Configure PyMySQL as MySQLdb driver
-import pymysql
-pymysql.install_as_MySQLdb()
+# Configure PyMySQL as MySQLdb driver (only for MySQL)
+db_engine = os.getenv('DB_ENGINE', 'django.db.backends.sqlite3')
+if db_engine == 'django.db.backends.mysql':
+    try:
+        import pymysql
+        pymysql.install_as_MySQLdb()
+    except ImportError:
+        pass
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -50,6 +55,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Serve static files in production
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -81,20 +87,31 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'buddy_script.wsgi.application'
 
-# Database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': config('DB_NAME', default='appifylab'),
-        'USER': config('DB_USER', default='root'),
-        'PASSWORD': config('DB_PASSWORD', default=''),
-        'HOST': config('DB_HOST', default='localhost'),
-        'PORT': config('DB_PORT', default='3306'),
-        'OPTIONS': {
-            'charset': 'utf8mb4',
+# Database - Support both SQLite (production) and MySQL (development)
+db_engine = config('DB_ENGINE', default='django.db.backends.sqlite3')
+
+if db_engine == 'django.db.backends.mysql':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': config('DB_NAME', default='appifylab'),
+            'USER': config('DB_USER', default='root'),
+            'PASSWORD': config('DB_PASSWORD', default=''),
+            'HOST': config('DB_HOST', default='localhost'),
+            'PORT': config('DB_PORT', default='3306'),
+            'OPTIONS': {
+                'charset': 'utf8mb4',
+            }
         }
     }
-}
+else:
+    # SQLite for production (Render)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -134,11 +151,11 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 20,
 }
 
-# CORS Configuration
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-]
+# CORS Configuration - Support both local and production URLs
+local_origins = ['http://localhost:3000', 'http://127.0.0.1:3000']
+production_origins = config('CORS_ORIGINS', default='').split(',') if config('CORS_ORIGINS', default='') else []
+
+CORS_ALLOWED_ORIGINS = local_origins + [o.strip() for o in production_origins if o.strip()]
 
 CORS_ALLOW_CREDENTIALS = True
 

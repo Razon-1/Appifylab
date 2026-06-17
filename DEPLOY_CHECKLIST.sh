@@ -1,0 +1,87 @@
+#!/bin/bash
+# Quick Production Deployment Checklist
+# =====================================
+# Follow these steps to deploy Buddy Script to Vercel + Render
+
+echo "📋 Buddy Script - Production Deployment Checklist"
+echo "=================================================="
+echo ""
+
+# Step 1: Git Setup
+echo "📝 Step 1: Initialize Git Repository"
+echo "  [ ] Run: git init"
+echo "  [ ] Run: git add ."
+echo "  [ ] Run: git commit -m 'Production ready setup'"
+echo "  [ ] Create new repo on GitHub"
+echo "  [ ] Run: git remote add origin https://github.com/YOUR_USERNAME/Appifylab.git"
+echo "  [ ] Run: git branch -M main"
+echo "  [ ] Run: git push -u origin main"
+echo ""
+
+# Step 2: Render Deploy
+echo "🚀 Step 2: Deploy Backend on Render"
+echo "  [ ] Go to render.com"
+echo "  [ ] Sign in (create account if needed)"
+echo "  [ ] Click 'New +' → 'Web Service'"
+echo "  [ ] Connect GitHub repository 'Appifylab'"
+echo "  [ ] Configure:"
+echo "      - Name: buddy-script-api"
+echo "      - Environment: Python"
+echo "      - Plan: Free"
+echo "  [ ] Wait for deployment (5-10 minutes)"
+echo "  [ ] Copy your Render URL: https://buddy-script-api-XXXXX.onrender.com"
+echo "  [ ] Save this URL ↑↑↑"
+echo ""
+
+# Step 3: Vercel Deploy
+echo "⚡ Step 3: Deploy Frontend on Vercel"
+echo "  [ ] Go to vercel.com"
+echo "  [ ] Sign in (create account if needed)"
+echo "  [ ] Click 'Add New' → 'Project'"
+echo "  [ ] Import GitHub repository 'Appifylab'"
+echo "  [ ] Configure:"
+echo "      - Framework: React"
+echo "      - Root Directory: buddy-frontend"
+echo "      - Build: npm run build"
+echo "      - Output: build"
+echo "  [ ] Add Environment Variable:"
+echo "      - Key: REACT_APP_API_URL"
+echo "      - Value: https://buddy-script-api-XXXXX.onrender.com/api"
+echo "  [ ] Deploy"
+echo "  [ ] Copy your Vercel URL: https://buddy-script-XXXXX.vercel.app"
+echo "  [ ] Save this URL ↑↑↑"
+echo ""
+
+# Step 4: Connect Services
+echo "🔗 Step 4: Connect Frontend & Backend"
+echo "  [ ] Go back to Render dashboard"
+echo "  [ ] Select 'buddy-script-api'"
+echo "  [ ] Go to 'Settings' → 'Environment'"
+echo "  [ ] Edit CORS_ORIGINS variable:"
+echo "      - Set to: https://buddy-script-XXXXX.vercel.app"
+echo "  [ ] Save (will redeploy automatically)"
+echo ""
+
+# Step 5: Test
+echo "✅ Step 5: Test Everything"
+echo "  [ ] Open https://buddy-script-XXXXX.vercel.app in browser"
+echo "  [ ] Register new account"
+echo "  [ ] Create a post"
+echo "  [ ] Refresh page - data should persist"
+echo "  [ ] Share URL with friends"
+echo ""
+
+echo "🎉 Deployment Complete!"
+echo "=================================================="
+echo ""
+echo "📊 Production URLs:"
+echo "   Frontend: https://buddy-script-XXXXX.vercel.app"
+echo "   Backend:  https://buddy-script-api-XXXXX.onrender.com"
+echo ""
+echo "💡 Tips:"
+echo "   - Service runs 24/7 even when your PC is off"
+echo "   - Free tier limits: 750 hours/month on Render"
+echo "   - Media uploads not persisted (upgrade to add)"
+echo "   - Database: SQLite on Render"
+echo ""
+echo "📖 For more details, see: DEPLOYMENT.md"

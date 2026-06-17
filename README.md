@@ -1,6 +1,8 @@
 # Buddy Script - Full Stack Social Network Application
 
-A modern, professional full-stack social networking platform built with **React**, **Django REST Framework**, **Tailwind CSS**, and **MySQL**.
+A modern, professional full-stack social networking platform built with **React**, **Django REST Framework**, **Tailwind CSS**, and **SQLite**.
+
+**🚀 Live Demo:** [Buddy Script on Vercel](https://buddy-script.vercel.app)
 
 ## Project Demo
 
@@ -12,6 +14,19 @@ Watch the project demonstration: [YouTube Demo](https://youtu.be/TG-g53FY-wE)
 git clone <repository-url>
 cd Appifylab
 ```
+
+## 🌐 Production Deployment
+
+Want to deploy to production servers (24/7 uptime, accessible from any device)?
+
+**See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete setup guide.**
+
+Quick summary:
+- **Frontend:** Deploy to Vercel (free)
+- **Backend:** Deploy to Render (free)
+- **Database:** SQLite on Render (included)
+- **Cost:** $0/month
+- **Uptime:** 24/7 when your local machine is OFF
 
 ## Running the Backend
 

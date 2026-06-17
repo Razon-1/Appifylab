@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: buddy-script-api
+    runtime: python
+    plan: free
+    pythonVersion: 3.11.4
+    buildCommand: |
+      pip install -r requirements.txt
+      python manage.py migrate --no-input
+      python manage.py collectstatic --no-input
+    startCommand: gunicorn buddy_script.wsgi:application --bind 0.0.0.0:$PORT
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_HOSTS
+        value: "*.onrender.com,localhost"
+      - key: DB_ENGINE
+        value: "django.db.backends.sqlite3"
+      - key: ENVIRONMENT
+        value: "production"
