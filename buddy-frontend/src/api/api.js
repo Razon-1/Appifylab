@@ -16,8 +16,8 @@
 
 import axios from 'axios';
 
-// Get API base URL from environment or default to local Django.
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
+// Get API base URL from environment or use deployed backend
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://buddy-script-api.onrender.com/api';
 
 /**
  * Axios instance with default configuration
