@@ -179,7 +179,14 @@ CORS_ALLOWED_ORIGINS = local_origins + [o.strip() for o in production_origins if
 
 CORS_ALLOW_CREDENTIALS = True
 
-# Logging Configuration
+# Logging Configuration - Console only for Render
+import os as os_module
+
+# Create logs directory if it doesn't exist (for local development)
+logs_dir = BASE_DIR / 'logs'
+if not logs_dir.exists():
+    logs_dir.mkdir(parents=True, exist_ok=True)
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -209,28 +216,20 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'simple',
         },
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': BASE_DIR / 'logs' / 'buddy_script.log',
-            'maxBytes': 1024 * 1024 * 10,  # 10MB
-            'backupCount': 5,
-            'formatter': 'verbose',
-        },
     },
     'root': {
         'level': 'INFO',
-        'handlers': ['console', 'file'],
+        'handlers': ['console'],
     },
     'loggers': {
         'django': {
             'level': 'INFO',
-            'handlers': ['console', 'file'],
+            'handlers': ['console'],
             'propagate': False,
         },
         'buddy_script': {
             'level': 'INFO',
-            'handlers': ['console', 'file'],
+            'handlers': ['console'],
             'propagate': False,
         },
     },
