@@ -33,8 +33,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-dev-key-change-in-production')
 
+
+def parse_bool(value):
+    if isinstance(value, bool):
+        return value
+
+    normalized = str(value).strip().lower()
+    if normalized in {'1', 'true', 't', 'yes', 'y', 'on', 'debug', 'development', 'dev'}:
+        return True
+    if normalized in {'0', 'false', 'f', 'no', 'n', 'off', 'release', 'production', 'prod'}:
+        return False
+
+    raise ValueError(f"Invalid truth value: {value}")
+
+
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=True, cast=bool)
+DEBUG = config('DEBUG', default=True, cast=parse_bool)
 
 def parse_allowed_hosts(value):
     hosts = []

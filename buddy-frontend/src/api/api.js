@@ -16,9 +16,15 @@
 
 import axios from 'axios';
 
-// Use deployed Render backend for all environments
-// Frontend deployed on Vercel connects to backend on Render
-export const API_BASE_URL = 'https://buddy-script-api.onrender.com/api';
+const getDefaultApiUrl = () => {
+  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+    return 'http://localhost:8000/api';
+  }
+
+  return 'https://buddy-script-api.onrender.com/api';
+};
+
+export const API_BASE_URL = (process.env.REACT_APP_API_URL || getDefaultApiUrl()).replace(/\/+$/, '');
 
 /**
  * Axios instance with default configuration
