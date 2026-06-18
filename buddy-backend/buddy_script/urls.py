@@ -16,6 +16,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.http import JsonResponse
+from django.views.static import serve
 
 
 def health_check(request):
@@ -39,4 +40,9 @@ urlpatterns = [
 
 # Serve uploaded media files. Render's free filesystem is ephemeral, so uploads may
 # disappear after redeploys/restarts unless persistent storage or S3 is added.
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+else:
+    urlpatterns += [
+        path('media/<path:path>', serve, {'document_root': settings.MEDIA_ROOT}),
+    ]
