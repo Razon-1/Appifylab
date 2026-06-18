@@ -2,7 +2,7 @@
 
 A modern, professional full-stack social networking platform built with **React**, **Django REST Framework**, **Tailwind CSS**, and **SQLite**.
 
-**🚀 Live Demo:** [Buddy Script on Vercel](https://buddy-script.vercel.app)
+**🚀 Live Demo:** [Buddy Script on Vercel](https://appifylab-frontend.vercel.app)
 
 ## Project Demo
 
@@ -15,18 +15,10 @@ git clone <repository-url>
 cd Appifylab
 ```
 
-## 🌐 Production Deployment
-
-Want to deploy to production servers (24/7 uptime, accessible from any device)?
-
-**See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete setup guide.**
 
 Quick summary:
 - **Frontend:** Deploy to Vercel (free)
-- **Backend:** Deploy to Render (free)
-- **Database:** SQLite on Render (included)
-- **Cost:** $0/month
-- **Uptime:** 24/7 when your local machine is OFF
+- **Backend:** Deploy to Render (free)-working last date-17.6.26
 
 ## Running the Backend
 
