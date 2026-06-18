@@ -19,6 +19,21 @@ cd Appifylab
 Quick summary:
 - **Frontend:** Deploy to Vercel (free)
 - **Backend:** Deploy to Render (free)-working last date-17.6.26
+- **Post images:** Use Cloudinary in production so uploaded images do not disappear after Render restarts.
+
+## Production Image Uploads
+
+Render's free filesystem is temporary, so uploaded post images should be stored outside the server.
+
+1. Create a free Cloudinary account.
+2. Copy the `CLOUDINARY_URL` value from your Cloudinary dashboard.
+3. Add it to your Render backend environment variables:
+```bash
+CLOUDINARY_URL=cloudinary://API_KEY:API_SECRET@CLOUD_NAME
+```
+4. Redeploy the Render backend.
+
+Newly uploaded images will then be served from Cloudinary.
 
 ## Running the Backend
 
